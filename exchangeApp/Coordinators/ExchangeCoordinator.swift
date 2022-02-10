@@ -54,7 +54,7 @@ extension ExchangeCoordinator: ConfirmationViewModelCoordinationDelegate {
         self.dismiss(animated: true)
     }
     func confirm() {
-        self.dismiss(animated: false, completion: {
+        self.dismiss(animated: true, completion: {
             self.start(.success, animated: true, onDismissed: nil)
         })
     }

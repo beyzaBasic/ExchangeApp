@@ -16,8 +16,12 @@ public protocol Router: AnyObject {
 }
 
 extension Router {
-    public func present(_ viewController: UIViewController,
+    func present(_ viewController: UIViewController,
                         animated: Bool) {
         present(viewController, animated: animated, onDismissed: nil)
+    }
+
+    func dismiss(animated: Bool, completion: (() -> Void)? = nil) {
+        // implement in Classes
     }
 }

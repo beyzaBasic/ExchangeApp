@@ -21,8 +21,4 @@ extension HomeRouter: Router {
         window.makeKeyAndVisible()
         window.rootViewController = viewController
     }
-
-    func dismiss(animated: Bool, completion: (() -> Void)?) {
-        // nothing happens
-    }
 }

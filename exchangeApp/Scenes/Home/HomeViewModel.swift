@@ -42,6 +42,15 @@ class HomeViewModel: HomeViewModelProtocol {
         self.viewModelCoordinationDelegate?.presentConfirmationScreen(viewController)
     }
     func selectCurrency(exchangeState: ExchangeState, _ viewController: HomeViewController) {
+
+        NetWorkManager.shared.accessRouter(endpointType: CurrencyEndpoint.self).request(.rateConversion(currency: "USD"), decoded: CurrencyResponse.self) { response in
+            print(response.baseCode)
+            print(response.conversionRates.eur)
+        } onFailure: { error in
+            print(error.description)
+        }
+
+
         self.viewModelCoordinationDelegate?.presentCurrencySelectionScreen(viewController)
     }
 }
