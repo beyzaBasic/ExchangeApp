@@ -9,7 +9,7 @@ import Foundation
 import RealmSwift
 
 @objcMembers
-class CurrencyResponse: Object, Codable {
+class RateResponse: Object, Codable {
     dynamic var id: Int = 333
     dynamic var result: String = ""
     dynamic var documentation: String = ""
@@ -19,7 +19,7 @@ class CurrencyResponse: Object, Codable {
     dynamic var timeNextUpdateUnix: Int = -1
     dynamic var timeNextUpdateUtc: String = ""
     dynamic var baseCode: String = ""
-    dynamic var conversionRates: CurrencyModel?
+    dynamic var conversionRates: RateModel?
 
     enum CodingKeys: String, CodingKey {
         case result

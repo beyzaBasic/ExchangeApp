@@ -30,10 +30,10 @@ class HomeCoordinator: Coordinator {
 }
 // MARK: HomeViewModel Coordination Delegate
 extension HomeCoordinator: HomeViewModelCoordinationDelegate {
-    func presentCurrencySelectionScreen(_ viewController: HomeViewController)  {
+    func presentCurrencySelectionScreen(_ viewController: HomeViewController, exchangeModel: ExchangeModel)  {
         let router = ExchangeRouter(parentViewController: viewController)
         let coordinator = ExchangeCoordinator(router: router)
-        self.startChild(.selection, coordinator, animated: true)
+        self.startChild(.selection(model: exchangeModel), coordinator, animated: true)
     }
 
     func presentConfirmationScreen(_ viewController: HomeViewController)  {

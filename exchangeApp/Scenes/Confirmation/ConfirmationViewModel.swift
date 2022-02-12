@@ -20,7 +20,7 @@ protocol ConfirmationViewModelCoordinationDelegate: AnyObject{
 
 // MARK: - Class Bone
 class ConfirmationViewModel: ConfirmationViewModelProtocol {
-    // MARK: Properties
+    // MARK: Attributes
     weak var viewModelCoordinationDelegate: ConfirmationViewModelCoordinationDelegate?
 
     func cancelTapped() {

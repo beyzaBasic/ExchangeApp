@@ -67,16 +67,16 @@ class DBManager: NSObject {
 
     // MARK: - Table Accessor
 
-    func getCurrencyResponse() -> CurrencyResponse? {
-        let model = Array(DBManager.shared.realm.objects(CurrencyResponse.self)).first
+    func getCurrencyResponse() -> RateResponse? {
+        let model = Array(DBManager.shared.realm.objects(RateResponse.self)).first
         return model
     }
 
-    func addCurrencyResponse(model: CurrencyResponse, completion: (Bool) -> Void) {
+    func addCurrencyResponse(model: RateResponse, completion: (Bool) -> Void) {
         self.safeAdd(update: nil, with: model, completion: completion)
     }
 
-    func updateCurrencyResponse(model: CurrencyResponse, completion: (Bool) -> Void) {
+    func updateCurrencyResponse(model: RateResponse, completion: (Bool) -> Void) {
         self.safeAdd(update: .modified, with: model, completion: completion)
     }
 

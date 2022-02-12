@@ -13,16 +13,61 @@ class SuccessViewController: UIViewController {
     private var viewModel: SuccessViewModelProtocol
 
     // MARK: Properties
+        private lazy var iconImageView: UIImageView = {  [unowned self] in
+            let imageView = UIImageView()
+            imageView.image = UIImage(named: "greenIcon")
+           // imageView.tintColor = UIColor(red: 38/255, green: 220/255, blue: 135/255, alpha: 1)
+            imageView.contentMode = .scaleAspectFit
+            imageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+            imageView.widthAnchor.constraint(equalToConstant: 60).isActive = true
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            return imageView
+        }()
+
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("Success", comment: "")
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        label.textColor = .black
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var infoLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("", comment: "")
+        label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        label.textColor = .darkGray
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        stackView.spacing = 20
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
     private lazy var backButton: UIButton = { [unowned self] in
         let button = UIButton()
-        button.backgroundColor = .clear
-        button.backgroundColor = .yellow
-        button.setTitle(NSLocalizedString("Back To Home", comment: ""), for: .normal)
+        button.backgroundColor = UIColor.Palette.blue
+        button.setTitle(NSLocalizedString("Back To Exchange", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.layer.cornerRadius = 26
-        button.isEnabled = true
-        button.alpha = 1
+        button.setTitleColor(.gray, for: .highlighted)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+        button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(self.backButtonTapped(_:)), for: .touchUpInside)
         return button
@@ -32,7 +77,7 @@ class SuccessViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpUI()
-        // Do any additional setup after loading the view.
+        self.feedResultData()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -53,12 +98,26 @@ class SuccessViewController: UIViewController {
 // MARK: - Set Up UI
 extension SuccessViewController {
     private func setUpUI() {
-        self.view.backgroundColor = .red
+        self.view.backgroundColor = .white
+        self.view.addSubview(self.stackView)
+        self.stackView.addArrangedSubview(self.iconImageView)
+        self.stackView.addArrangedSubview(self.titleLabel)
+        self.stackView.addArrangedSubview(self.infoLabel)
+        self.stackView.setCustomSpacing(20, after: self.iconImageView)
         self.view.addSubview(self.backButton)
-        self.backButton.widthAnchor.constraint(equalToConstant: 200).isActive = true
+
+        self.stackView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        self.stackView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        self.backButton.widthAnchor.constraint(equalToConstant: 300).isActive = true
         self.backButton.heightAnchor.constraint(equalToConstant: 52).isActive = true
         self.backButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        self.backButton.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        self.backButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -60).isActive = true
+    }
+
+    private func feedResultData() {
+        if let exchangeModel = self.viewModel.exchangeModel, let value = exchangeModel.value {
+            self.infoLabel.text = "\(exchangeModel.value) \(exchangeModel.fromCurrency.symbol)  =  \(exchangeModel.toCurrency.symbol) \(value/2)"
+        }
     }
 }
 
