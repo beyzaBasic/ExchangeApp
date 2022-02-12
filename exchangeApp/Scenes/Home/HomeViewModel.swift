@@ -44,13 +44,25 @@ class HomeViewModel: HomeViewModelProtocol {
     func selectCurrency(exchangeState: ExchangeState, _ viewController: HomeViewController) {
 
         NetWorkManager.shared.accessRouter(endpointType: CurrencyEndpoint.self).request(.rateConversion(currency: "USD"), decoded: CurrencyResponse.self) { response in
-            print(response.baseCode)
-            print(response.conversionRates.eur)
+            if DBManager.shared.getCurrencyResponse() == nil {
+            DBManager.shared.addCurrencyResponse(model: response) { _ in
+                print(DBManager.shared.getCurrencyResponse()?.baseCode)
+                print(DBManager.shared.getCurrencyResponse()?.id)
+                print(DBManager.shared.getCurrencyResponse()?.conversionRates?.trl)
+                print(DBManager.shared.getCurrencyResponse()?.timeLastUpdateUtc)
+            }
+            } else {
+                DBManager.shared.updateCurrencyResponse(model: response) { _ in
+                    print(DBManager.shared.getCurrencyResponse()?.baseCode)
+                    print(DBManager.shared.getCurrencyResponse()?.id)
+                    print(DBManager.shared.getCurrencyResponse()?.conversionRates?.trl)
+                    print(DBManager.shared.getCurrencyResponse()?.timeLastUpdateUtc)
+                    print(DBManager.shared.getCurrencyResponse()?.timeNextUpdateUtc)
+                }
+            }
         } onFailure: { error in
             print(error.description)
         }
-
-
         self.viewModelCoordinationDelegate?.presentCurrencySelectionScreen(viewController)
     }
 }

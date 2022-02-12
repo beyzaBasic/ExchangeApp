@@ -22,11 +22,18 @@ class ExchangeCoordinator: Coordinator {
             viewController.view.backgroundColor = .gray
             self.router.present(viewController, animated: true)
         case .confirmation:
-            let viewModel = ConfirmationViewModel()
-            viewModel.viewModelCoordinationDelegate = self
-            let viewController = ConfirmationViewController(viewModel: viewModel)
-            viewController.view.backgroundColor = .cyan
-            self.router.present(viewController, animated: true)
+//            let viewModel = ConfirmationViewModel()
+//            viewModel.viewModelCoordinationDelegate = self
+//            let viewController = ConfirmationViewController(viewModel: viewModel)
+//            viewController.view.backgroundColor = .cyan
+//            self.router.present(viewController, animated: true)
+            let title = NSLocalizedString("Confirm Operation", comment: "")
+            let message = NSLocalizedString("Are you to get TL102 for $120? Do you approve the transaction?", comment: "")
+                UIAlertController.confirmkWithMessage(title: title, message: message, router: router) { action in
+                    self.dismiss(animated: true, completion: {
+                        self.start(.success, animated: true, onDismissed: nil)
+                    })
+                }
         case .success:
             let viewModel = SuccessViewModel()
             viewModel.viewModelCoordinationDelegate = self
@@ -54,9 +61,7 @@ extension ExchangeCoordinator: ConfirmationViewModelCoordinationDelegate {
         self.dismiss(animated: true)
     }
     func confirm() {
-        self.dismiss(animated: true, completion: {
-            self.start(.success, animated: true, onDismissed: nil)
-        })
+
     }
 }
 
