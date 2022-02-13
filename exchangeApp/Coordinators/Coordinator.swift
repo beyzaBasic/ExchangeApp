@@ -14,7 +14,6 @@ protocol Coordinator: AnyObject {
     func start (_ actionType: ExchangeActionType?, animated: Bool, onDismissed: (() -> Void)?)
     func dismiss(animated: Bool, completion:(() -> Void)?)
     func startChild(_ actionType: ExchangeActionType?, _ child: Coordinator, animated: Bool, onDismissed: (() -> Void)?)
-    init(router: Router)
 }
 
 extension Coordinator {

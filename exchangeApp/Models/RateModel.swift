@@ -34,30 +34,30 @@ class RateModel: Object, Codable {
 }
 
 enum Currency {
-    case usd
-    case trl
-    case eur
-    case rub
-    case gel
-    case ggp
-    case kyd
+    case usd(model: RateModel)
+    case trl(model: RateModel)
+    case eur(model: RateModel)
+    case rub(model: RateModel)
+    case gel(model: RateModel)
+    case ggp(model: RateModel)
+    case kyd(model: RateModel)
 
-    var rate: Double? {
+    var rate: Double {
         switch self {
-        case .usd:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.usd
-        case .trl:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.trl
-        case .eur:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.eur
-        case .rub:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.rub
-        case .gel:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.gel
-        case .ggp:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.ggp
-        case .kyd:
-            return DBManager.shared.getCurrencyResponse()?.conversionRates?.kyd
+        case .usd(let rate):
+            return rate.usd
+        case .trl(let rate):
+            return rate.trl
+        case .eur(let rate):
+            return rate.eur
+        case .rub(let rate):
+            return rate.rub
+        case .gel(let rate):
+            return rate.gel
+        case .ggp(let rate):
+            return rate.ggp
+        case .kyd(let rate):
+            return rate.kyd
         }
     }
 

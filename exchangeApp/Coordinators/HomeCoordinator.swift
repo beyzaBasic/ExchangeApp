@@ -24,7 +24,7 @@ class HomeCoordinator: Coordinator {
         router.present(navigationController, animated: true)
     }
 
-    required init(router: Router) {
+    init(router: Router) {
         self.router = router
     }
 }
@@ -36,10 +36,10 @@ extension HomeCoordinator: HomeViewModelCoordinationDelegate {
         self.startChild(.selection(model: exchangeModel), coordinator, animated: true)
     }
 
-    func presentConfirmationScreen(_ viewController: HomeViewController)  {
+    func presentConfirmationScreen(_ viewController: HomeViewController, exchangeModel: ExchangeModel)  {
         let router = ExchangeRouter(parentViewController: viewController)
         let coordinator = ExchangeCoordinator(router: router)
-        self.startChild(.confirmation, coordinator, animated: true)
+        self.startChild(.confirmation(model:exchangeModel), coordinator, animated: true)
     }
 }
 

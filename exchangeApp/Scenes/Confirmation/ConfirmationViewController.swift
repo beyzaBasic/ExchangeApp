@@ -34,12 +34,6 @@ class ConfirmationViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        guard let touch = touches.first else { return }
-        self.viewModel.confirmTapped()
-    }
 }
 // MARK: - Set Up UI
 extension ConfirmationViewController {

@@ -108,7 +108,7 @@ class HomeViewController: UIViewController {
         textField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
         textField.delegate = self
         textField.keyboardType = .numberPad
-        textField.backgroundColor = .red
+        textField.backgroundColor = .clear
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -116,7 +116,7 @@ class HomeViewController: UIViewController {
     private lazy var amountLabel: UILabel = {
         let label = UILabel()
         label.text = NSLocalizedString("", comment: "")
-        label.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .gray
         label.textAlignment = .center
         label.numberOfLines = 1
@@ -126,8 +126,8 @@ class HomeViewController: UIViewController {
         return label
     }()
 
-    private lazy var rateLabel: UILabel = {
-        let label = UILabel()
+    private lazy var rateLabel: InsetLabel = { [unowned self] in
+        let label = InsetLabel()
         label.text = NSLocalizedString("", comment: "")
         label.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
         label.textColor = .gray
@@ -135,6 +135,10 @@ class HomeViewController: UIViewController {
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.5
         label.adjustsFontSizeToFitWidth = true
+        label.layer.cornerRadius = 15
+        label.layer.borderWidth = 1
+        label.layer.borderColor = UIColor.lightGray.cgColor
+        label.heightAnchor.constraint(equalToConstant: 30).isActive = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -152,10 +156,16 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpUI()
-        self.setRateData()
-        // Do any additional setup after loading the view.
-    }
+        self.updateAmountUI(textField: self.currencyTextField)
+        self.updateExchangeButtonUI(textField: self.currencyTextField)
 
+        self.viewModel.getRatesFromCloudIfNeeded { rateModel in
+            self.updateRateUI()
+        } onFailure: { networkError in
+            
+        }
+
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
@@ -235,53 +245,69 @@ extension HomeViewController {
         self.currencyTextField.heightAnchor.constraint(equalTo: self.topStackView.heightAnchor, multiplier: 2).isActive = true
     }
 
-    private func setAmountData() {
-        let amountText = "Final Amount: "
-        let amountInfo = self.viewModel.exchangeModel.toCurrency.symbol + ((self.viewModel.exchangeModel.value ?? 0)/2).description
-        self.amountLabel.text = NSLocalizedString(amountText, comment: "") + " " + amountInfo
+    private func updateAmountUI(textField: UITextField) {
+
+        if let text = textField.text, !text.isEmpty, let doubleValue = Double(text) {
+            self.viewModel.updateExchangeValue(value: doubleValue)
+        } else {
+            self.viewModel.updateExchangeValue(value: nil)
+        }
+        self.viewModel.setExchangeModelResultWithRateCalculation()
+        let amountText = NSLocalizedString("Final Amount: ", comment: "")
+        let amountInfo = self.viewModel.exchangeModel.toCurrency.symbol + ((self.viewModel.exchangeModel.result ?? 0).description)
+        self.amountLabel.setAttributedText(texts:
+                                            [TextAttributeModel(text: amountText, attributes: nil),
+                                             TextAttributeModel(text: amountInfo, attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .bold)])])
     }
 
-    private func setRateData() {
-        self.rateLabel.text = " 1 \(self.viewModel.exchangeModel.fromCurrency.title) = 0.5 \(self.viewModel.exchangeModel.toCurrency.title)"
+    private func updateRateUI() {
+        self.rateLabel.text = "1 \(self.viewModel.exchangeModel.fromCurrency.title) = \(self.viewModel.exchangeModel.toCurrency.rate / self.viewModel.exchangeModel.fromCurrency.rate) \(self.viewModel.exchangeModel.toCurrency.title)"
     }
 
-}
-
-// MARK: - Actions
-extension HomeViewController {
-    @objc private func exchangeButtonTapped(_ sender: UIButton) {
-        self.viewModel.confirmationTriggered(self)
-    }
-
-    @objc private func toggleButtonTapped(_ sender: UIButton) {
-        let  tempFromVal = self.viewModel.exchangeModel.fromCurrency
-        self.viewModel.exchangeModel.fromCurrency = self.viewModel.exchangeModel.toCurrency
-        self.viewModel.exchangeModel.toCurrency = tempFromVal
-
+    private func updateCurrencyButtonUI() {
+        self.viewModel.toggleFromToCurrencies()
         if let leftLabel = self.view.viewWithTag(44) as? UILabel {
             leftLabel.text = self.viewModel.exchangeModel.fromCurrency.title
         }
         if let rightLabel = self.view.viewWithTag(45) as? UILabel {
             rightLabel.text = self.viewModel.exchangeModel.toCurrency.title
         }
+    }
 
-        self.setRateData()
+    private func updateExchangeButtonUI(textField: UITextField) {
+        if let text = textField.text, !text.isEmpty {
+            self.exchangeButton.isEnabled = true
+            self.exchangeButton.alpha = 1
+        } else {
+            self.exchangeButton.isEnabled = false
+            self.exchangeButton.alpha = 0.5
+        }
+    }
+}
 
+// MARK: - Actions
+extension HomeViewController {
+    @objc private func exchangeButtonTapped(_ sender: UIButton) {
+        self.viewModel.confirmationTriggered(exchangeModel: self.viewModel.exchangeModel, self)
+    }
+
+    @objc private func toggleButtonTapped(_ sender: UIButton) {
+        self.updateCurrencyButtonUI()
+        self.updateRateUI()
+        self.updateAmountUI(textField: self.currencyTextField)
     }
 
     @objc private func leftButtonTapped(_ sender: UIButton) {
-        self.viewModel.selectCurrency(exchangeModel: self.viewModel.exchangeModel,  self)
+        self.viewModel.updateSelectionState(selectionState: .fromCurrency, self)
     }
 
     @objc private func rightButtonTapped(_ sender: UIButton) {
-        self.viewModel.selectCurrency(exchangeModel: self.viewModel.exchangeModel, self)
+        self.viewModel.updateSelectionState(selectionState: .toCurrency, self)
     }
 
     @objc func textChanged(_ sender: UITextField) {
-        if let text = currencyTextField.text, !text.isEmpty, let doubleValue = Double(text) {
-            self.viewModel.exchangeModel.value = doubleValue
-            self.setAmountData()
-        }
+        self.updateExchangeButtonUI(textField: self.currencyTextField)
+        self.updateAmountUI(textField: self.currencyTextField)
     }
 }
 
@@ -292,5 +318,12 @@ extension HomeViewController: UITextFieldDelegate {
             textField.resignFirstResponder()
             return true}
         return false
+    }
+}
+
+extension HomeViewController: CurrencySelectionViewModelViewDelegate {
+    func currencySelected(exchangeModel: ExchangeModel) {
+        self.updateRateUI()
+        self.updateAmountUI(textField: self.currencyTextField)
     }
 }

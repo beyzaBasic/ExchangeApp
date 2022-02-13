@@ -12,7 +12,6 @@ class ExchangeCoordinator: Coordinator {
     // MARK: Attributes
     var children: [Coordinator] = []
     let router: Router
-    private var exchangeModel: ExchangeModel?
 
     func start(_ actionType: ExchangeActionType?, animated: Bool, onDismissed: (() -> Void)?) {
         switch actionType {
@@ -20,16 +19,16 @@ class ExchangeCoordinator: Coordinator {
             let viewModel = CurrencySelectionViewModel(exchangeModel: exchangeModel)
             viewModel.viewModelCoordinationDelegate = self
             let viewController = CurrencySelectionViewController(viewModel: viewModel)
-            viewController.view.backgroundColor = .gray
             self.router.present(viewController, animated: true)
-        case .confirmation:
+        case .confirmation( let exchangeModel):
             //            let viewModel = ConfirmationViewModel()
             //            viewModel.viewModelCoordinationDelegate = self
             //            let viewController = ConfirmationViewController(viewModel: viewModel)
             //            viewController.view.backgroundColor = .cyan
             //            self.router.present(viewController, animated: true)
-            self.presentConfirmationAlert()
-        case .success:
+            self.presentConfirmationAlert(exchangeModel: exchangeModel)
+            
+        case .success( let exchangeModel):
             let viewModel = SuccessViewModel(exchangeModel: exchangeModel)
             viewModel.viewModelCoordinationDelegate = self
             let viewController = SuccessViewController(viewModel: viewModel)
@@ -39,29 +38,29 @@ class ExchangeCoordinator: Coordinator {
         }
     }
 
-    required init(router: Router) {
+    init(router: Router) {
         self.router = router
     }
 
-    private func presentConfirmationAlert() {
+    private func presentConfirmationAlert(exchangeModel: ExchangeModel) {
         let title = NSLocalizedString("Confirm Operation", comment: "")
         var fromCurrencyMessage = ""
         var toCurrencyMessage = ""
-        if let exchangeModel = self.exchangeModel, let value = exchangeModel.value {
+        if let value = exchangeModel.value, let result = exchangeModel.result {
             fromCurrencyMessage = exchangeModel.fromCurrency.symbol+(Int(value)).description
-            toCurrencyMessage = exchangeModel.toCurrency.symbol+(Int(value)).description
+            toCurrencyMessage = exchangeModel.toCurrency.symbol+(Int(result)).description
         }
         let message = NSLocalizedString("Are you to get \(toCurrencyMessage) for \(fromCurrencyMessage) ? Do you approve the transaction?", comment: "")
         UIAlertController.confirmkWithMessage(title: title, message: message, router: router) { action in
             self.dismiss(animated: true, completion: {
-                self.start(.success, animated: true, onDismissed: nil)
+                self.start(.success(model: exchangeModel), animated: true, onDismissed: nil)
             })
         }
     }
 }
 
 extension ExchangeCoordinator: CurrencySelectionViewModelCoordinationDelegate {
-    func currencySelected(exchangeModel: ExchangeModel) {
+    func closeScreen() {
         self.dismiss(animated: true)
     }
 }

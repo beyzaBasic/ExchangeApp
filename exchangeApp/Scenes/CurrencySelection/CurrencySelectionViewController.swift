@@ -15,7 +15,7 @@ class CurrencySelectionViewController: UIViewController {
     // MARK: Properties
     private lazy var tableView: UITableView = { [unowned self] in
         let table = UITableView(frame: .zero, style: .grouped)
-        table.backgroundColor = UIColor.clear
+        table.backgroundColor = .white
         table.translatesAutoresizingMaskIntoConstraints = false
         table.separatorStyle = .singleLine
         table.showsVerticalScrollIndicator = false
@@ -47,17 +47,17 @@ class CurrencySelectionViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        guard let touch = touches.first else { return }
-
-    }
 }
 // MARK: - Set Up UI
 extension CurrencySelectionViewController {
     private func setUpUI() {
-        self.view.backgroundColor = .red
+        self.view.backgroundColor = .clear
+        self.view.addSubview(self.tableView)
+        self.tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        self.tableView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.4).isActive = true
+        self.tableView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
+        self.tableView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+
     }
 }
 
@@ -75,6 +75,7 @@ extension CurrencySelectionViewController: UITableViewDelegate, UITableViewDataS
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.viewModel.screenClosed(index: indexPath.row)
 
     }
 

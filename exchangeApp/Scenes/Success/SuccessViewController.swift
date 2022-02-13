@@ -115,8 +115,8 @@ extension SuccessViewController {
     }
 
     private func feedResultData() {
-        if let exchangeModel = self.viewModel.exchangeModel, let value = exchangeModel.value {
-            self.infoLabel.text = "\(exchangeModel.value) \(exchangeModel.fromCurrency.symbol)  =  \(exchangeModel.toCurrency.symbol) \(value/2)"
+        if let exchangeModel = self.viewModel.exchangeModel, let value = exchangeModel.value, let result = exchangeModel.result {
+            self.infoLabel.text = "\(value) \(exchangeModel.fromCurrency.symbol)  =  \(exchangeModel.toCurrency.symbol) \(result)"
         }
     }
 }

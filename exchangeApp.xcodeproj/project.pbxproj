@@ -43,6 +43,8 @@
 		0427872F27B81B0600C4E12F /* CustomArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0427872E27B81B0600C4E12F /* CustomArrow.swift */; };
 		0427873127B83C1600C4E12F /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0427873027B83C1600C4E12F /* UIColor+Ext.swift */; };
 		0427873327B84F1C00C4E12F /* CurrencySelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0427873227B84F1C00C4E12F /* CurrencySelectionTableViewCell.swift */; };
+		0492343A27B9388100FDAE97 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0492343927B9388100FDAE97 /* InsetLabel.swift */; };
+		0492343C27B9397C00FDAE97 /* UILabel+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0492343B27B9397C00FDAE97 /* UILabel+Ext.swift */; };
 		9E110341D7D11672D1B323A5 /* Pods_exchangeApp_exchangeAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C4E319610722FD01053116E3 /* Pods_exchangeApp_exchangeAppUITests.framework */; };
 		BC3731198473C36A440D6BAD /* Pods_exchangeAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6E2D0F6BD5C0A5759CBAC50 /* Pods_exchangeAppTests.framework */; };
 		FA6922D6F128F0E9F964459F /* Pods_exchangeApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 109927B5DF3AF7CB7DEACE34 /* Pods_exchangeApp.framework */; };
@@ -108,6 +110,8 @@
 		0427872E27B81B0600C4E12F /* CustomArrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomArrow.swift; sourceTree = "<group>"; };
 		0427873027B83C1600C4E12F /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
 		0427873227B84F1C00C4E12F /* CurrencySelectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencySelectionTableViewCell.swift; sourceTree = "<group>"; };
+		0492343927B9388100FDAE97 /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
+		0492343B27B9397C00FDAE97 /* UILabel+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Ext.swift"; sourceTree = "<group>"; };
 		109927B5DF3AF7CB7DEACE34 /* Pods_exchangeApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_exchangeApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE1E8FD918A54D76457355C /* Pods-exchangeApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-exchangeApp.release.xcconfig"; path = "Target Support Files/Pods-exchangeApp/Pods-exchangeApp.release.xcconfig"; sourceTree = "<group>"; };
 		609ECA9A7960599D7FE6EE1A /* Pods-exchangeApp-exchangeAppUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-exchangeApp-exchangeAppUITests.debug.xcconfig"; path = "Target Support Files/Pods-exchangeApp-exchangeAppUITests/Pods-exchangeApp-exchangeAppUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -296,6 +300,7 @@
 				0427872627B6742500C4E12F /* String+Ext.swift */,
 				0427872927B7D3CA00C4E12F /* UIAlertController.swift */,
 				0427873027B83C1600C4E12F /* UIColor+Ext.swift */,
+				0492343B27B9397C00FDAE97 /* UILabel+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -321,6 +326,7 @@
 			isa = PBXGroup;
 			children = (
 				0427872E27B81B0600C4E12F /* CustomArrow.swift */,
+				0492343927B9388100FDAE97 /* InsetLabel.swift */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -612,9 +618,11 @@
 				042786ED27B5095D00C4E12F /* Coordinator.swift in Sources */,
 				0427870A27B52CDE00C4E12F /* SuccessViewModel.swift in Sources */,
 				042786F127B50EB100C4E12F /* HomeCoordinator.swift in Sources */,
+				0492343A27B9388100FDAE97 /* InsetLabel.swift in Sources */,
 				042786F927B50FFF00C4E12F /* HomeRouter.swift in Sources */,
 				0427870327B5151200C4E12F /* CurrencySelectionViewModel.swift in Sources */,
 				0427871927B5980C00C4E12F /* NetworkRequestProtocol.swift in Sources */,
+				0492343C27B9397C00FDAE97 /* UILabel+Ext.swift in Sources */,
 				0427871B27B5987F00C4E12F /* NetworkRouter.swift in Sources */,
 				042786FD27B5143500C4E12F /* ExchangeCoordinator.swift in Sources */,
 				042786F727B50F3A00C4E12F /* HomeViewModel.swift in Sources */,
