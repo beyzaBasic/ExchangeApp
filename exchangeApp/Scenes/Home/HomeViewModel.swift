@@ -57,13 +57,6 @@ class HomeViewModel: HomeViewModelProtocol {
     weak var viewModelCoordinationDelegate: HomeViewModelCoordinationDelegate?
     var exchangeModel: ExchangeModel = .init(fromCurrency: .eur(model: RateModel()),
                                              toCurrency: .usd(model: RateModel()))
-    var currencyList: [Currency] = [.usd(model: RateModel()),
-                                    .eur(model: RateModel()),
-                                    .trl(model: RateModel()),
-                                    .rub(model: RateModel()),
-                                    .gel(model: RateModel()),
-                                    .ggp(model: RateModel()),
-                                    .kyd(model: RateModel())]
 
     func toggleFromToCurrencies() {
         let  tempFromVal = self.exchangeModel.fromCurrency

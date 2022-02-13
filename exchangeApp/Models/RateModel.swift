@@ -33,31 +33,31 @@ class RateModel: Object, Codable {
     }
 }
 
-enum Currency {
-    case usd(model: RateModel)
-    case trl(model: RateModel)
-    case eur(model: RateModel)
-    case rub(model: RateModel)
-    case gel(model: RateModel)
-    case ggp(model: RateModel)
-    case kyd(model: RateModel)
+enum Currency: Equatable {
+    case usd(model: RateModel?)
+    case trl(model: RateModel?)
+    case eur(model: RateModel?)
+    case rub(model: RateModel?)
+    case gel(model: RateModel?)
+    case ggp(model: RateModel?)
+    case kyd(model: RateModel?)
 
     var rate: Double {
         switch self {
         case .usd(let rate):
-            return rate.usd
+            return rate?.usd ?? 1
         case .trl(let rate):
-            return rate.trl
+            return rate?.trl ?? 1
         case .eur(let rate):
-            return rate.eur
+            return rate?.eur ?? 1
         case .rub(let rate):
-            return rate.rub
+            return rate?.rub ?? 1
         case .gel(let rate):
-            return rate.gel
+            return rate?.gel ?? 1
         case .ggp(let rate):
-            return rate.ggp
+            return rate?.ggp ?? 1
         case .kyd(let rate):
-            return rate.kyd
+            return rate?.kyd ?? 1
         }
     }
 
@@ -97,5 +97,9 @@ enum Currency {
         case .kyd:
             return "KYD"
         }
+    }
+
+    static func == (lhs: Currency, rhs: Currency) -> Bool {
+        return lhs.title == rhs.title
     }
 }

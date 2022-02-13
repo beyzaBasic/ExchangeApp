@@ -13,16 +13,16 @@ class SuccessViewController: UIViewController {
     private var viewModel: SuccessViewModelProtocol
 
     // MARK: Properties
-        private lazy var iconImageView: UIImageView = {  [unowned self] in
-            let imageView = UIImageView()
-            imageView.image = UIImage(named: "greenIcon")
-           // imageView.tintColor = UIColor(red: 38/255, green: 220/255, blue: 135/255, alpha: 1)
-            imageView.contentMode = .scaleAspectFit
-            imageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
-            imageView.widthAnchor.constraint(equalToConstant: 60).isActive = true
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            return imageView
-        }()
+    private lazy var iconImageView: UIImageView = {  [unowned self] in
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "greenIcon")
+        // imageView.tintColor = UIColor(red: 38/255, green: 220/255, blue: 135/255, alpha: 1)
+        imageView.contentMode = .scaleAspectFit
+        imageView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -40,8 +40,8 @@ class SuccessViewController: UIViewController {
     private lazy var infoLabel: UILabel = {
         let label = UILabel()
         label.text = NSLocalizedString("", comment: "")
-        label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
-        label.textColor = .darkGray
+        label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        label.textColor = .lightGray
         label.textAlignment = .center
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.5
@@ -116,7 +116,12 @@ extension SuccessViewController {
 
     private func feedResultData() {
         if let exchangeModel = self.viewModel.exchangeModel, let value = exchangeModel.value, let result = exchangeModel.result {
-            self.infoLabel.text = "\(value) \(exchangeModel.fromCurrency.symbol)  =  \(exchangeModel.toCurrency.symbol) \(result)"
+            let fromCurrencyText = "\(round(10*value)/10) \(exchangeModel.fromCurrency.symbol)"
+            let toCurrencyText = "\(exchangeModel.toCurrency.symbol) \(round(10*result)/10)"
+            self.infoLabel.setAttributedText(texts:
+                                                [TextAttributeModel(text: fromCurrencyText, attributes: nil),
+                                                 TextAttributeModel(text: "  =  ", attributes: nil),
+                                                 TextAttributeModel(text: toCurrencyText, attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .bold) ])])
         }
     }
 }

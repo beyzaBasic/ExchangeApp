@@ -113,10 +113,19 @@ class HomeViewController: UIViewController {
         return textField
     }()
 
+    private lazy var lineView: UIView = { [unowned self] in
+        let container = UIView()
+        container.layer.cornerRadius = 0.5
+        container.alpha = 0.8
+        container.backgroundColor = .lightGray
+        container.translatesAutoresizingMaskIntoConstraints = false
+        return container
+    }()
+
     private lazy var amountLabel: UILabel = {
         let label = UILabel()
         label.text = NSLocalizedString("", comment: "")
-        label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         label.textColor = .gray
         label.textAlignment = .center
         label.numberOfLines = 1
@@ -185,21 +194,20 @@ class HomeViewController: UIViewController {
 extension HomeViewController {
     private func setUpUI() {
         self.view.backgroundColor = .white
-
-
         self.view.addSubview(self.verticalStackView)
-        self.view.addSubview(self.exchangeButton)
         self.verticalStackView.addArrangedSubview(self.topStackView)
         self.verticalStackView.addArrangedSubview(self.currencyTextField)
         self.verticalStackView.addArrangedSubview(self.amountLabel)
+        self.verticalStackView.addSubview(self.lineView)
         self.verticalStackView.addArrangedSubview(self.rateLabel)
+        self.verticalStackView.addArrangedSubview(self.exchangeButton)
         self.navigationItem.title = NSLocalizedString("Exchange", comment: "")
 
         self.verticalStackView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 40).isActive = true
 
         self.verticalStackView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         self.verticalStackView.widthAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.widthAnchor).isActive = true
-        self.verticalStackView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 1/3).isActive = true
+        self.verticalStackView.heightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.5).isActive = true
 
         self.exchangeButton.widthAnchor.constraint(equalToConstant: 300).isActive = true
         self.exchangeButton.heightAnchor.constraint(equalToConstant: 52).isActive = true
@@ -220,7 +228,6 @@ extension HomeViewController {
         self.topStackView.addSubview(leftCurrencyLabel)
         self.topStackView.addSubview(rightArrow)
         self.topStackView.addSubview(rightCurrencyLabel)
-
         self.topStackView.heightAnchor.constraint(equalToConstant: 36).isActive = true
         self.topStackView.widthAnchor.constraint(equalTo: self.exchangeButton.widthAnchor, multiplier: 0.8).isActive = true
 
@@ -236,13 +243,14 @@ extension HomeViewController {
         rightCurrencyLabel.leadingAnchor.constraint(equalTo: self.rightButtonView.leadingAnchor, constant: 15).isActive = true
         leftCurrencyLabel.centerYAnchor.constraint(equalTo: self.leftButtonView.centerYAnchor).isActive = true
         leftCurrencyLabel.leadingAnchor.constraint(equalTo: self.leftButtonView.leadingAnchor, constant: 15).isActive = true
-
         self.toggleButton.widthAnchor.constraint(equalTo: self.toggleButton.heightAnchor).isActive = true
-        self.exchangeButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -60).isActive = true
-        self.exchangeButton.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor).isActive = true
         self.rightButtonView.widthAnchor.constraint(equalToConstant: 80).isActive = true
         self.leftButtonView.widthAnchor.constraint(equalToConstant: 80).isActive = true
         self.currencyTextField.heightAnchor.constraint(equalTo: self.topStackView.heightAnchor, multiplier: 2).isActive = true
+        self.lineView.topAnchor.constraint(equalTo: self.currencyTextField.bottomAnchor, constant: 5).isActive = true
+        self.lineView.centerXAnchor.constraint(equalTo: self.currencyTextField.centerXAnchor).isActive = true
+        self.lineView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        self.lineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
     }
 
     private func updateAmountUI(textField: UITextField) {
@@ -254,14 +262,17 @@ extension HomeViewController {
         }
         self.viewModel.setExchangeModelResultWithRateCalculation()
         let amountText = NSLocalizedString("Final Amount: ", comment: "")
-        let amountInfo = self.viewModel.exchangeModel.toCurrency.symbol + ((self.viewModel.exchangeModel.result ?? 0).description)
+        let amountSymbol = self.viewModel.exchangeModel.toCurrency.symbol
+        let amountInfo: Double = self.viewModel.exchangeModel.result != nil ? round(10 * self.viewModel.exchangeModel.result!) / 10 : 0
+
         self.amountLabel.setAttributedText(texts:
                                             [TextAttributeModel(text: amountText, attributes: nil),
-                                             TextAttributeModel(text: amountInfo, attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .bold)])])
+                                             TextAttributeModel(text: amountSymbol, attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .bold)]),
+                                             TextAttributeModel(text: amountInfo.description, attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .bold)])])
     }
 
     private func updateRateUI() {
-        self.rateLabel.text = "1 \(self.viewModel.exchangeModel.fromCurrency.title) = \(self.viewModel.exchangeModel.toCurrency.rate / self.viewModel.exchangeModel.fromCurrency.rate) \(self.viewModel.exchangeModel.toCurrency.title)"
+        self.rateLabel.text = "1 \(self.viewModel.exchangeModel.fromCurrency.title) = \(round (100 * (self.viewModel.exchangeModel.toCurrency.rate / self.viewModel.exchangeModel.fromCurrency.rate)) / 100) \(self.viewModel.exchangeModel.toCurrency.title)"
     }
 
     private func updateCurrencyButtonUI() {

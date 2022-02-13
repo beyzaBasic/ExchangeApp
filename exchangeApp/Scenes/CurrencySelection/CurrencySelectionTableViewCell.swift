@@ -7,6 +7,9 @@
 
 import UIKit
 
+protocol CurrencySelectionTableViewCellDelegate: AnyObject {
+    func currencySelected(currency: Currency)
+}
 // MARK: - Class Bone
 class CurrencySelectionTableViewCell: UITableViewCell {
     // MARK: Properties
@@ -14,7 +17,7 @@ class CurrencySelectionTableViewCell: UITableViewCell {
         let label = UILabel()
         label.text = NSLocalizedString("Title", comment: "")
         label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
-        label.textColor = .darkGray
+        label.textColor = .lightGray
         label.textAlignment = .left
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.5
@@ -23,8 +26,23 @@ class CurrencySelectionTableViewCell: UITableViewCell {
         return label
     }()
 
+    private lazy var iconImageView: UIImageView = { [unowned self] in
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleToFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
+        imageView.backgroundColor = .lightGray
+        imageView.isUserInteractionEnabled = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(selectButtonTapped(_:))))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
     // MARK: Attributes
     static let identifier = "CurrencySelectionTableViewCell"
+    weak var delegate: CurrencySelectionTableViewCellDelegate?
+    private(set) var currency: Currency?
 
     // MARK: Life Cycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -55,16 +73,44 @@ extension CurrencySelectionTableViewCell {
     private func setUpUI() {
         self.contentView.backgroundColor = .clear
         self.contentView.addSubview(self.titleLabel)
+        self.contentView.addSubview(self.iconImageView)
+
+        self.iconImageView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -20).isActive = true
+        self.iconImageView.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor).isActive = true
+        self.iconImageView.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        self.iconImageView.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        self.titleLabel.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor).isActive = true
+
         self.titleLabel.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 20).isActive = true
-        self.titleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -20).isActive = true
         self.titleLabel.centerYAnchor.constraint(equalTo: self.contentView.centerYAnchor).isActive = true
     }
 }
 
+// MARK: - Actions
+extension CurrencySelectionTableViewCell {
+    @objc func selectButtonTapped(_ : UIButton) {
+        guard let currency = self.currency else { return}
+        self.iconImageView.image = UIImage(named: "selectIcon")
+        self.iconImageView.backgroundColor = .white
+        self.delegate?.currencySelected(currency: currency)
+    }
+}
 // MARK: - Public
 extension CurrencySelectionTableViewCell {
-    func configureCell(currency: Currency) {
+    func configureCell(currency: Currency, isSelected: Bool) {
         titleLabel.text = currency.title
+        self.currency = currency
+        if isSelected {
+            self.iconImageView.image = UIImage(named: "selectIcon")
+            self.iconImageView.backgroundColor = .white
+            self.iconImageView.alpha = 1
+            self.titleLabel.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+        } else {
+            self.iconImageView.image = nil
+            self.iconImageView.backgroundColor = .lightGray
+            self.iconImageView.alpha = 0.3
+            self.titleLabel.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        }
     }
 }
 

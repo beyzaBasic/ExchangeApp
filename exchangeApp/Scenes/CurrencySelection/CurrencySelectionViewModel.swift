@@ -12,7 +12,9 @@ protocol CurrencySelectionViewModelProtocol: AnyObject  {
     var viewModelViewDelegate: CurrencySelectionViewModelViewDelegate? { get set }
     var exchangeModel: ExchangeModel { get set }
     var currencyList: [Currency] { get set }
-    func screenClosed(index: Int)
+    func screenClosed()
+    func selectedCondition(currency: Currency) -> Bool
+    func updateExchangeModelWithSelectedCurrency(currency: Currency)
 }
 
 protocol CurrencySelectionViewModelCoordinationDelegate: AnyObject {
@@ -32,32 +34,27 @@ class CurrencySelectionViewModel: CurrencySelectionViewModelProtocol {
     weak var viewModelViewDelegate: CurrencySelectionViewModelViewDelegate?
     var exchangeModel: ExchangeModel
     var currencyList: [Currency]
-    var rateModel: RateModel
 
     init (exchangeModel: ExchangeModel) {
-        print(exchangeModel.fromCurrency)
-        print(exchangeModel.toCurrency)
         self.exchangeModel = exchangeModel
-        self.rateModel = DBManager.shared.getCurrencyResponse()?.conversionRates ?? RateModel()
-        let tempList: [Currency] = [.usd(model: self.rateModel),
-                       .eur(model: self.rateModel),
-                       .trl(model: self.rateModel),
-                       .rub(model: self.rateModel),
-                       .gel(model: self.rateModel),
-                       .ggp(model: self.rateModel),
-                       .kyd(model: self.rateModel)]
+        let tempList: [Currency] = [.usd(model: RateModel()),
+                       .eur(model: nil),
+                       .trl(model: nil),
+                       .rub(model: nil),
+                       .gel(model: nil),
+                       .ggp(model: nil),
+                       .kyd(model: nil)]
         switch self.exchangeModel.selectionState {
         case .toCurrency:
-            self.currencyList = tempList.filter{$0.title != exchangeModel.fromCurrency.title && $0.title != exchangeModel.toCurrency.title }
+            self.currencyList = tempList.filter{$0 != exchangeModel.fromCurrency }
         case .fromCurrency:
-            self.currencyList = tempList.filter{$0.title != exchangeModel.fromCurrency.title && $0.title != exchangeModel.toCurrency.title }
+            self.currencyList = tempList.filter{$0 != exchangeModel.toCurrency }
         case .none:
             self.currencyList = tempList
         }
     }
 
-    private func updateExchangeModel(index: Int) {
-        let currency = self.currencyList[index]
+    func updateExchangeModelWithSelectedCurrency(currency: Currency) {
         switch self.exchangeModel.selectionState {
         case .fromCurrency:
             self.exchangeModel.fromCurrency = currency
@@ -68,9 +65,21 @@ class CurrencySelectionViewModel: CurrencySelectionViewModelProtocol {
         }
     }
 
-    func screenClosed(index: Int) {
-        self.updateExchangeModel(index: index)
+    func screenClosed() {
         self.viewModelViewDelegate?.currencySelected(exchangeModel: self.exchangeModel)
         self.viewModelCoordinationDelegate?.closeScreen()
     }
+
+    func selectedCondition(currency: Currency) -> Bool {
+        switch self.exchangeModel.selectionState {
+        case .fromCurrency:
+            return currency == self.exchangeModel.fromCurrency
+        case .toCurrency:
+            return currency == self.exchangeModel.toCurrency
+        case .none:
+            return false
+        }
+    }
 }
+
+

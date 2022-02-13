@@ -20,12 +20,8 @@ class ExchangeCoordinator: Coordinator {
             viewModel.viewModelCoordinationDelegate = self
             let viewController = CurrencySelectionViewController(viewModel: viewModel)
             self.router.present(viewController, animated: true)
+            
         case .confirmation( let exchangeModel):
-            //            let viewModel = ConfirmationViewModel()
-            //            viewModel.viewModelCoordinationDelegate = self
-            //            let viewController = ConfirmationViewController(viewModel: viewModel)
-            //            viewController.view.backgroundColor = .cyan
-            //            self.router.present(viewController, animated: true)
             self.presentConfirmationAlert(exchangeModel: exchangeModel)
             
         case .success( let exchangeModel):
@@ -47,8 +43,8 @@ class ExchangeCoordinator: Coordinator {
         var fromCurrencyMessage = ""
         var toCurrencyMessage = ""
         if let value = exchangeModel.value, let result = exchangeModel.result {
-            fromCurrencyMessage = exchangeModel.fromCurrency.symbol+(Int(value)).description
-            toCurrencyMessage = exchangeModel.toCurrency.symbol+(Int(result)).description
+            fromCurrencyMessage = exchangeModel.fromCurrency.symbol+(Int(value.rounded())).description
+            toCurrencyMessage = exchangeModel.toCurrency.symbol+(Int(result.rounded())).description
         }
         let message = NSLocalizedString("Are you to get \(toCurrencyMessage) for \(fromCurrencyMessage) ? Do you approve the transaction?", comment: "")
         UIAlertController.confirmkWithMessage(title: title, message: message, router: router) { action in
@@ -64,15 +60,6 @@ extension ExchangeCoordinator: CurrencySelectionViewModelCoordinationDelegate {
         self.dismiss(animated: true)
     }
 }
-
-//extension ExchangeCoordinator: ConfirmationViewModelCoordinationDelegate {
-//    func cancel() {
-//        self.dismiss(animated: true)
-//    }
-//    func confirm() {
-//
-//    }
-//}
 
 extension ExchangeCoordinator: SuccessViewModelCoordinationDelegate {
     func backToHome() {
