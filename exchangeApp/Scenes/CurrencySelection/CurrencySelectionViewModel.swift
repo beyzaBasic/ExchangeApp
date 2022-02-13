@@ -23,10 +23,8 @@ protocol CurrencySelectionViewModelCoordinationDelegate: AnyObject {
 }
 
 protocol CurrencySelectionViewModelViewDelegate: AnyObject {
-    func currencySelected(exchangeModel: ExchangeModel)
-
+    func updateUI()
 }
-
 // MARK: - Class Bone
 class CurrencySelectionViewModel: CurrencySelectionViewModelProtocol {
     // MARK: Attributes
@@ -55,6 +53,7 @@ class CurrencySelectionViewModel: CurrencySelectionViewModelProtocol {
     }
 
     func updateExchangeModelWithSelectedCurrency(currency: Currency) {
+        print(self.exchangeModel.selectionState)
         switch self.exchangeModel.selectionState {
         case .fromCurrency:
             self.exchangeModel.fromCurrency = currency
@@ -66,7 +65,7 @@ class CurrencySelectionViewModel: CurrencySelectionViewModelProtocol {
     }
 
     func screenClosed() {
-        self.viewModelViewDelegate?.currencySelected(exchangeModel: self.exchangeModel)
+        self.viewModelViewDelegate?.updateUI()
         self.viewModelCoordinationDelegate?.closeScreen()
     }
 

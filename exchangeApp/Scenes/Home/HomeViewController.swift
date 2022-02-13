@@ -258,8 +258,9 @@ extension HomeViewController {
         if let text = textField.text, !text.isEmpty, let doubleValue = Double(text) {
             self.viewModel.updateExchangeValue(value: doubleValue)
         } else {
-            self.viewModel.updateExchangeValue(value: nil)
+            self.viewModel.updateExchangeValue(value: 0)
         }
+
         self.viewModel.setExchangeModelResultWithRateCalculation()
         let amountText = NSLocalizedString("Final Amount: ", comment: "")
         let amountSymbol = self.viewModel.exchangeModel.toCurrency.symbol
@@ -275,8 +276,12 @@ extension HomeViewController {
         self.rateLabel.text = "1 \(self.viewModel.exchangeModel.fromCurrency.title) = \(round (100 * (self.viewModel.exchangeModel.toCurrency.rate / self.viewModel.exchangeModel.fromCurrency.rate)) / 100) \(self.viewModel.exchangeModel.toCurrency.title)"
     }
 
-    private func updateCurrencyButtonUI() {
+    private func toggleCurrencyButtonUI() {
         self.viewModel.toggleFromToCurrencies()
+        self.updateCurrencyButtonUI()
+    }
+
+    private func updateCurrencyButtonUI() {
         if let leftLabel = self.view.viewWithTag(44) as? UILabel {
             leftLabel.text = self.viewModel.exchangeModel.fromCurrency.title
         }
@@ -303,7 +308,7 @@ extension HomeViewController {
     }
 
     @objc private func toggleButtonTapped(_ sender: UIButton) {
-        self.updateCurrencyButtonUI()
+        self.toggleCurrencyButtonUI()
         self.updateRateUI()
         self.updateAmountUI(textField: self.currencyTextField)
     }
@@ -333,8 +338,20 @@ extension HomeViewController: UITextFieldDelegate {
 }
 
 extension HomeViewController: CurrencySelectionViewModelViewDelegate {
-    func currencySelected(exchangeModel: ExchangeModel) {
+    func updateUI() {
+        self.viewModel.updateFromToCurrenciesWithRateData()
+        self.updateCurrencyButtonUI()
         self.updateRateUI()
+        self.updateAmountUI(textField: self.currencyTextField)
+    }
+}
+
+extension HomeViewController: SuccessViewModelViewDelegate {
+    func resetUI() {
+        self.viewModel.resetFromToCurrenciesWithRateData()
+        self.updateCurrencyButtonUI()
+        self.updateRateUI()
+        self.currencyTextField.text = ""
         self.updateAmountUI(textField: self.currencyTextField)
     }
 }

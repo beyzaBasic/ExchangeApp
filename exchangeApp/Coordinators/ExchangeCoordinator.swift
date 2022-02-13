@@ -20,6 +20,9 @@ class ExchangeCoordinator: Coordinator {
             viewModel.viewModelCoordinationDelegate = self
             let viewController = CurrencySelectionViewController(viewModel: viewModel)
             self.router.present(viewController, animated: true)
+            if let router = self.router as? ExchangeRouter, let parentViewController = router.parentViewController as? CurrencySelectionViewModelViewDelegate {
+                viewModel.viewModelViewDelegate = parentViewController
+            }
             
         case .confirmation( let exchangeModel):
             self.presentConfirmationAlert(exchangeModel: exchangeModel)
@@ -29,6 +32,9 @@ class ExchangeCoordinator: Coordinator {
             viewModel.viewModelCoordinationDelegate = self
             let viewController = SuccessViewController(viewModel: viewModel)
             self.router.present(viewController, animated: true)
+            if let router = self.router as? ExchangeRouter, let parentViewController = router.parentViewController as? SuccessViewModelViewDelegate {
+                viewModel.viewModelViewDelegate = parentViewController
+            }
         case .none:
             break
         }

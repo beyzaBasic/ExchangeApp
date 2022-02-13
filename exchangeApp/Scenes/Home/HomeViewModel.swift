@@ -14,8 +14,11 @@ protocol HomeViewModelProtocol: AnyObject {
     func updateSelectionState(selectionState: SelectionState, _ viewController: HomeViewController)
     func getRatesFromCloudIfNeeded(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void)
     func setExchangeModelResultWithRateCalculation()
+    func updateFromToCurrenciesWithRateData()
+    func resetFromToCurrenciesWithRateData() 
     var viewModelCoordinationDelegate: HomeViewModelCoordinationDelegate? {get set}
     var exchangeModel: ExchangeModel { get set}
+    var rateModel: RateModel? { get set}
 }
 
 protocol HomeViewModelCoordinationDelegate: AnyObject {
@@ -57,6 +60,7 @@ class HomeViewModel: HomeViewModelProtocol {
     weak var viewModelCoordinationDelegate: HomeViewModelCoordinationDelegate?
     var exchangeModel: ExchangeModel = .init(fromCurrency: .eur(model: RateModel()),
                                              toCurrency: .usd(model: RateModel()))
+    var rateModel:  RateModel?
 
     func toggleFromToCurrencies() {
         let  tempFromVal = self.exchangeModel.fromCurrency
@@ -74,7 +78,6 @@ class HomeViewModel: HomeViewModelProtocol {
 
     func updateSelectionState(selectionState: SelectionState, _ viewController: HomeViewController) {
         self.exchangeModel.selectionState = selectionState
-
         self.viewModelCoordinationDelegate?.presentCurrencySelectionScreen(viewController, exchangeModel: exchangeModel)
     }
 
@@ -82,12 +85,14 @@ class HomeViewModel: HomeViewModelProtocol {
         NetWorkManager.shared.accessRouter(endpointType: CurrencyEndpoint.self).request(.rateConversion(currency: "USD"), decoded: RateResponse.self) { response in
             if DBManager.shared.getCurrencyResponse() == nil {
                 DBManager.shared.addCurrencyResponse(model: response) { _ in
-                    self.updateFromToCurrenciesWithRateData(rateModel: response.conversionRates)
+                    self.rateModel = response.conversionRates
+                    self.updateFromToCurrenciesWithRateData()
                     onSuccess(response.conversionRates)
                 }
             } else {
                 DBManager.shared.updateCurrencyResponse(model: response) { _ in
-                    self.updateFromToCurrenciesWithRateData(rateModel: response.conversionRates)
+                    self.rateModel = response.conversionRates
+                    self.updateFromToCurrenciesWithRateData()
                     onSuccess(response.conversionRates)
                 }
             }
@@ -102,12 +107,11 @@ class HomeViewModel: HomeViewModelProtocol {
 
     func setExchangeModelResultWithRateCalculation() {
         guard let value = self.exchangeModel.value else { return }
-
         self.exchangeModel.result = (value / self.exchangeModel.fromCurrency.rate) *  self.exchangeModel.toCurrency.rate
     }
 
-    private func updateCurrencyWithRateData(currency: Currency, rateModel: RateModel?) -> Currency {
-        guard let rateModel = rateModel else {
+    func updateCurrencyWithRateData(currency: Currency) -> Currency {
+        guard let rateModel = self.rateModel else {
             return currency }
 
         switch currency {
@@ -128,9 +132,13 @@ class HomeViewModel: HomeViewModelProtocol {
         }
     }
 
-    private func updateFromToCurrenciesWithRateData(rateModel: RateModel?) {
-        self.exchangeModel.fromCurrency = self.updateCurrencyWithRateData(currency: self.exchangeModel.fromCurrency, rateModel: rateModel)
+    func updateFromToCurrenciesWithRateData() {
+        self.exchangeModel.fromCurrency = self.updateCurrencyWithRateData(currency: self.exchangeModel.fromCurrency)
+        self.exchangeModel.toCurrency = self.updateCurrencyWithRateData(currency: self.exchangeModel.toCurrency)
+    }
 
-        self.exchangeModel.toCurrency = self.updateCurrencyWithRateData(currency: self.exchangeModel.toCurrency, rateModel: rateModel)
+    func resetFromToCurrenciesWithRateData() {
+        self.exchangeModel.fromCurrency = self.updateCurrencyWithRateData(currency: .usd(model: self.rateModel))
+        self.exchangeModel.toCurrency = self.updateCurrencyWithRateData(currency: .eur(model: self.rateModel))
     }
 }
