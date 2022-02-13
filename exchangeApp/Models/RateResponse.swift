@@ -20,6 +20,7 @@ class RateResponse: Object, Codable {
     dynamic var timeNextUpdateUtc: String = ""
     dynamic var baseCode: String = ""
     dynamic var conversionRates: RateModel?
+    dynamic var timeStamp: Date = .init()
 
     enum CodingKeys: String, CodingKey {
         case result

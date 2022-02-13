@@ -12,7 +12,7 @@ protocol HomeViewModelProtocol: AnyObject {
     func toggleFromToCurrencies()
     func updateExchangeValue(value: Double?)
     func updateSelectionState(selectionState: SelectionState, _ viewController: HomeViewController)
-    func getRatesFromCloudIfNeeded(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void)
+    func getCurrencyRates(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void)
     func setExchangeModelResultWithRateCalculation()
     func updateFromToCurrenciesWithRateData()
     func resetFromToCurrenciesWithRateData() 
@@ -81,23 +81,47 @@ class HomeViewModel: HomeViewModelProtocol {
         self.viewModelCoordinationDelegate?.presentCurrencySelectionScreen(viewController, exchangeModel: exchangeModel)
     }
 
-    func getRatesFromCloudIfNeeded(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void) {
+    private func getRatesFromCloud(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void) {
         NetWorkManager.shared.accessRouter(endpointType: CurrencyEndpoint.self).request(.rateConversion(currency: "USD"), decoded: RateResponse.self) { response in
             if DBManager.shared.getCurrencyResponse() == nil {
                 DBManager.shared.addCurrencyResponse(model: response) { _ in
                     self.rateModel = response.conversionRates
                     self.updateFromToCurrenciesWithRateData()
-                    onSuccess(response.conversionRates)
+                    onSuccess(self.rateModel)
                 }
             } else {
                 DBManager.shared.updateCurrencyResponse(model: response) { _ in
                     self.rateModel = response.conversionRates
                     self.updateFromToCurrenciesWithRateData()
-                    onSuccess(response.conversionRates)
+                    onSuccess(self.rateModel)
                 }
             }
         } onFailure: { error in
             onFailure(error)
+        }
+    }
+
+    func getCurrencyRates(onSuccess: @escaping (RateModel?) -> Void, onFailure: @escaping (NetworkError?) -> Void) {
+        var condition = false
+
+        if DBManager.shared.getCurrencyResponse()?.timeStamp == nil {
+            condition = true
+        } else if let previousResponseModelDate = DBManager.shared.getCurrencyResponse()?.timeStamp,
+           let nextAvailableDate = Calendar.current.date(byAdding: .hour, value: 24, to: previousResponseModelDate) {
+                let currentDate = Date()
+            condition = currentDate.timeIntervalSinceReferenceDate >= nextAvailableDate.timeIntervalSinceReferenceDate
+        }
+
+        if condition {
+            self.getRatesFromCloud { rateModel in
+              onSuccess(rateModel)
+            } onFailure: { networkError in
+              onFailure(networkError)
+            }
+        } else {
+            self.rateModel = DBManager.shared.getCurrencyResponse()?.conversionRates
+            self.updateFromToCurrenciesWithRateData()
+            onSuccess(self.rateModel)
         }
     }
 

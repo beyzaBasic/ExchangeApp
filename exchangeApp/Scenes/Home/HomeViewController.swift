@@ -168,13 +168,14 @@ class HomeViewController: UIViewController {
         self.updateAmountUI(textField: self.currencyTextField)
         self.updateExchangeButtonUI(textField: self.currencyTextField)
 
-        self.viewModel.getRatesFromCloudIfNeeded { rateModel in
+        self.viewModel.getCurrencyRates{ rateModel in
             self.updateRateUI()
         } onFailure: { networkError in
-            
+            if let error = networkError {
+                print(error.description)}
         }
-
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
